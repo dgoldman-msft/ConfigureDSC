@@ -79,6 +79,7 @@ function New-DSCConfiguration {
 		try {
 			Write-Host -ForegroundColor Cyan "`nStage 1 - Starting DSC pull server configuration"
 			. .\InstallPreReqs.ps1
+			InstallPreReqs.ps1
 
 			if ($GetEventLogs) {
 				Get-WinEvent -LogName "Microsoft-Windows-Dsc/Operational" -MaxEvents $NumberOfEvents | Format-List

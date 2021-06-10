@@ -228,7 +228,7 @@
         PullClientConfigID
 
         try {
-            Write-Host -ForegroundColor Cyan "`nStage 2 - Setting selected configuration  to the local DSC configuration manager"
+            Write-Host -ForegroundColor Cyan "`nStage 2 - Setting configuration: $($customObjects[$choice].Guid) to the local DSC configuration manager"
             if ($parameters.ContainsKey('Verbose')) { Set-DSCLocalConfigurationManager -Path $script:ModuleRoot\PullClientConfigID\ -Verbose -Force	}
             else { Set-DSCLocalConfigurationManager -Path $script:ModuleRoot\PullClientConfigID\ -Force	}
             if ($parameters.ContainsKey('Verbose')) { Update-DscConfiguration -Verbose }

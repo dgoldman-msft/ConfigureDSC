@@ -189,4 +189,3 @@ function Install-SoftwareComponent {
 	}
 }
 
-InstallPreReqs
