@@ -48,6 +48,15 @@ function InstallPreReqs {
 			[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12, [Net.SecurityProtocolType]::SSl3
 		}
 
+		Write-Host -ForegroundColor Green "Checking for Nuget package source"
+		if (-NOT (Get-PackageSource | Where-Object Name -eq 'Nuget')) { 
+            Write-Host -ForegroundColor Yellow "Nuget package source not found. Registering"
+            $null = Register-PackageSource -Name NuGet -Location https://www.nuget.org/api/v2 -ProviderName NuGet -Force 
+        }
+        else {
+            Write-Host -ForegroundColor Green "Nuget found and registered as a package source provider"
+        } 
+
 		Write-Host -ForegroundColor Green "Checking PowerShell Version. Minimum PowerShell version need is 5.1"
 		$psVersion = $PSVersionTable.PSVersion.ToString()
 		

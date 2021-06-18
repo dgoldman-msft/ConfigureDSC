@@ -62,7 +62,7 @@ function New-DSCConfiguration {
 	)
 
 	begin {
-		Start-Transcript -Path "C:\ConfigureDSC\Logging\NewDSCConfiguration.Log" -NoClobber -Append
+		Start-Transcript -Path "C:\ConfigureDSC\Logging\New-DSCConfiguration.Log" -NoClobber -Append
 		$parameters = $PSBoundParameters
 		$script:ModuleRoot = $PSScriptRoot
 		Write-Host -ForegroundColor Green "Ensuring TLS1.2 is enabled"
