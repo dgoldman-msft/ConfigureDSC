@@ -2,40 +2,14 @@
 
 ## This helper script will automate the install and configuration of a simple DSC SMB server
 
-1. Log to your new DC1 after you have ran Dcpromo and have your domain setup
-2. Navigate to the c:\ConfigureDSC
+NOTE: you can use this is a workstation non domain joined scenareo, however this will work better for machines in a domain.
 
-### NOTE 1: This is the default directory structure
+1. Select copy and download a zip file of this repository.
+2. Create a folder called ConfigureDSC
+3. Extract the contents of the zip file into the directory.
+4. Navigate to the c:\ConfigureDSC
 
-> C:.<br>
-├───ConfigurationFiles<br>
-├───docs<br>
-│   └───en-US<br>
-└───ServerConfigFiles<br>
-
-3. Open PowerShell and run . .\New-DSCCConfiguration.ps1 -CreateDSCFileShare
-
-> This will load the New-DSCConfiguration PowerShell script in to the local interactive PowerShell session
-
-This will create the default DSCShareFolder structure in the root of c:\ and apply all necessary permissions.
-
-a. This will call InstallPreReqs.ps1 script which will do the following on the DC
-
-    i. Create a directory called c:\CreateDSC\Logging
-    ii. Start a transcript of all actions
-    iii. Set the execution policy so we can download software<br>
-    iv. Enable-PSremoting
-    v. Install PowerShell and DSC modules in the following location: c:\Program Files\WindowsPowerShel\Modules
-    vi. Check if TLS12 is present and if not set it
-    vii. Checks for PowerShell Version 5.1 on Windows server platforms. If the version is 4.0 we will install Windows Management Framework 5.1
-        1 - If we are on the DC we will create the ExchangeAdmin account and add the account to all relevant groups needed for Exchange installation actions.
-	    2 - If ran from a client with the -Exchange switch we will install the Unified Communications Managed API 4.0 Runtime
-        3 - Check to see if .Net Framework 4.8 is installed
-    viii. Checks for Nuget (new PowerShell setup on a new machine)
-    ix. Registered the PackageProvider
-    x. Start the install of all modules
-    xi. Reset the execution policy back to the default
-### NOTE 3: This is the default directory structure after the install
+### This is the default directory structure
 
 > C:.<br>
 │   Get-DscConfig.ps1<br>
@@ -61,9 +35,34 @@ a. This will call InstallPreReqs.ps1 script which will do the following on the D
 │<br>
 └───ServerConfigFiles<br>
         ConfigureShares.ps1
-		
-> 1. Inside the c:\DSCSMBShare folder you will see two files (a mof file and checksum file) for each configuration generated
-> 2. All configuration files to be pulled by the clients will be stored in the ConfigurationFiles folder
+
+5. Open PowerShell and run . .\New-DSCCConfiguration.ps1
+
+> This will load the New-DSCConfiguration PowerShell script in to the local interactive PowerShell session
+
+6. Run New-DSCConfiguration -CreateDSCFileShare
+
+> This will create the default the c:\DSCSMBShare shared folder and apply all necessary permissions.
+
+a. This will call InstallPreReqs.ps1 script which will do the following:
+
+    i. Create a directory called c:\CreateDSC\Logging
+    ii. Start a transcript of all actions
+    iii. Set the execution policy so we can download software<br>
+    iv. Enable-PSremoting
+    v. Install PowerShell and DSC modules in the following location: c:\Program Files\WindowsPowerShel\Modules
+    vi. Check if TLS12 is present and if not set it
+    vii. Checks for PowerShell Version 5.1 on Windows server platforms. If the version is 4.0 we will install Windows Management Framework 5.1
+        1 - If we are on the DC we will create the ExchangeAdmin account and add the account to all relevant groups needed for Exchange installation actions.
+	    2 - If ran from a client with the -Exchange switch we will install the Unified Communications Managed API 4.0 Runtime
+        3 - Check to see if .Net Framework 4.8 is installed
+    viii. Checks for Nuget (new PowerShell setup on a new machine)
+    ix. Registered the PackageProvider
+    x. Start the install of all modules
+    xi. Reset the execution policy back to the default
+    		
+> 1. Inside c:\DSCSMBShare you will see two files (a mof file and checksum file) for each configuration generated.
+> 2. All configuration files to be pulled by the clients will be stored in the ConfigurationFiles folder.
 
 # New-DSClientConfiguration
 
@@ -71,12 +70,13 @@ a. This will call InstallPreReqs.ps1 script which will do the following on the D
 
 From a client machine after the machine has been joined to the domain
 
-1. Connect to \\\\DC1\Software\ConfigureDSC
+1. Connect to \\\\YourDSCServer\Software\ConfigureDSC
 
->You will be prompted for your administrator account and MyWorkspace admin account password. Make sure you save the network connection so you are not asked in the future
+> You will be prompted for your administrator account and admin account password. Make sure you save the network connection so you are not asked in the future
 
-2. Copy both files InstallPreReqs.ps1 and New-DSCClientConfiguration.ps1 to your local c:\ConfigureDSC folder
-3. Run . .\InstallPreReqs.ps1 
+2. Create a new directory called C:\ConfigureDsC
+3. Copy both files InstallPreReqs.ps1 and New-DSCClientConfiguration.ps1 to your local c:\ConfigureDSC folder
+4. Run . .\InstallPreReqs.ps1
 
 > This will import the InstallPreReqs method in to the local PowerShell session. This needs to be ran first on the client machine to install dependencies for PowerShell and the DSC framework.
 
@@ -84,22 +84,22 @@ From a client machine after the machine has been joined to the domain
    2. For non-exchange setup: run InstallPreReqqs -Verbose
 
 	i. This will create a directory called c:\CreateDSC\Logging
-		ii. Start a transcript of all actions
-		iii. Set the execution policy so we can download software
-		iv. Enable PS-Remoting for PowerShell
-		v. Install PowerShell and DSC modules in the following location: C:\Program Files\WindowsPowerShel\Modules
-		vi. Check if TLS12 is present and if not set it
-		vii. Checks for PowerShell Version 5.1 on Windows server platforms. If the version is 4.0 we will install Windows Management Framework 1
-				1 - The use of the -Exchange switch we will force the install Unified Communications Managed API 4.0 Runtime
-				2 - Check to see if .Net Framework 4.8 is installed and report back
-		viii. Checks for Nuget (new PowerShell setup on a new machine)
-		ix. Registered the PackageProvider
-		x. Start the install of all modules
-		xi. Reset the execution policy back to the default
+	ii. Start a transcript of all actions
+	iii. Set the execution policy so we can download software
+	iv. Enable PS-Remoting for PowerShell
+	v. Install PowerShell and DSC modules in the following location: C:\Program Files\WindowsPowerShel\Modules
+	vi. Check if TLS12 is present and if not set it
+	vii. Checks for PowerShell Version 5.1 on Windows server platforms. If the version is 4.0 we will install Windows Management Framework 1
+	        1 - The use of the -Exchange switch we will force the install Unified Communications Managed API 4.0 Runtime
+		2 - Check to see if .Net Framework 4.8 is installed and report back
+	viii. Checks for Nuget (new PowerShell setup on a new machine)
+	ix. Registered the PackageProvider
+	x. Start the install of all modules
+	xi. Reset the execution policy back to the default
 
-4. Run: New-DSCClientConfiguration -Verbose -$DSCSMBServer DC1
+5. Run: New-DSCClientConfiguration -Verbose -$DSCSMBServer YourDSCServer
 
-> This will connect to \\\\DC1\DSCSharedFolder and read in all configuration files generated on DC1. 
+> This will connect to \\\\YourDSCServer\DSCSharedFolder and read in all configuration files generated on DC1. 
 
 > The first time you attempt to connect you will need to put in your DC administrator account and password. You can copy the password from MyWorkspace and paste it in. YOU WILL NOT SEE ANY OUTPUT FROM THE CUT AND PASTE
 
