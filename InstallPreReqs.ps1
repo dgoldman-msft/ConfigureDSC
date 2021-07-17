@@ -34,6 +34,7 @@ function InstallPreReqs {
 		# Software urls
 		$wmfUrl = 'https://go.microsoft.com/fwlink/?linkid=839516'
 		$ucUrl = 'https://download.microsoft.com/download/2/C/4/2C47A5C1-A1F3-4843-B9FE-84C0032C61EC/UcmaRuntimeSetup.exe'
+		$net48Url = 'https://go.microsoft.com/fwlink/?linkid=2088631'
 	}
 
 	process {
@@ -50,12 +51,12 @@ function InstallPreReqs {
 
 		Write-Host -ForegroundColor Green "Checking for Nuget package source"
 		if (-NOT (Get-PackageSource | Where-Object Name -eq 'Nuget')) { 
-            Write-Host -ForegroundColor Yellow "Nuget package source not found. Registering"
-            $null = Register-PackageSource -Name NuGet -Location https://www.nuget.org/api/v2 -ProviderName NuGet -Force 
-        }
-        else {
-            Write-Host -ForegroundColor Green "Nuget found and registered as a package source provider"
-        } 
+			Write-Host -ForegroundColor Yellow "Nuget package source not found. Registering"
+			$null = Register-PackageSource -Name NuGet -Location https://www.nuget.org/api/v2 -ProviderName NuGet -Force 
+		}
+		else {
+			Write-Host -ForegroundColor Green "Nuget found and registered as a package source provider"
+		} 
 
 		Write-Host -ForegroundColor Green "Checking PowerShell Version. Minimum PowerShell version need is 5.1"
 		$psVersion = $PSVersionTable.PSVersion.ToString()
@@ -107,7 +108,10 @@ function InstallPreReqs {
 			Write-Host -ForegroundColor Green "Exchange PreReq - Checking to see if .Net Framework 4.8 is installed"
 			$versions = Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse -ErrorAction SilentlyContinue | Get-ItemProperty -Name Version -ErrorAction SilentlyContinue | Where-Object { $_.PSChildName -match '^(?!S)\p{L}' } | Select-Object Version | Sort-Object -Descending Version
 			if ($versions[0].Version -gt '4.0') { Write-Host -ForegroundColor Green ".Net Framework 4.8 installed!" }
-			else { Write-Host -ForegroundColor Yellow ".Net Framework 4.8 not installed and is needed for Exchange Server!"	} 
+			else {
+				Write-Host -ForegroundColor Yellow "Installing .Net Framework 4.8"
+				Install-SoftwareComponent -SoftwarePackage 'Net4.8.exe' -Url $net48Url
+  			} 
 		}
 
 		Write-Host -ForegroundColor Green "Checking for Nuget Package Provider"
@@ -186,8 +190,8 @@ function Install-SoftwareComponent {
 			$outpath = "$env:TEMP\$SoftwarePackage"
 			Invoke-WebRequest -Uri $Url -OutFile $outpath
 		
-			# Install Windows Framework 5.1
-			$cmdArguements = '/quiet /norestart'
+			# Install Windows Framework 5.1 or .Net Framework 4.8
+			$cmdArguements = '/q /norestart'
 			Start-Process -Filepath "$env:TEMP\$SoftwarePackage" -ArgumentList $cmdArguements -Wait
 			$true
 		}
